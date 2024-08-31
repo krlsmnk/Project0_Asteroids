@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 282773958011623836}
   - component: {fileID: 7768805141426117696}
   - component: {fileID: 79775725765249973}
+  - component: {fileID: 6778995825988199528}
   m_Layer: 0
   m_Name: Asteroid
   m_TagString: asteroid
@@ -28,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 408797473368988800}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.0015648, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -50,7 +51,14 @@ MonoBehaviour:
   scale: 3
   flySpeed: 2
   rotationSpeed: 10
-  sizeThreshold: 1
+  biggus: 0
+  crackSounds:
+  - {fileID: 8300000, guid: 172718477e7328d478f7c93fa511b925, type: 3}
+  impactPlayer: {fileID: 8300000, guid: 4ecce94b3f12aa141a533f871f525718, type: 3}
+  audioMixer: {fileID: 24100000, guid: ca9e5e0e32d37d540ab6d347d141e768, type: 2}
+  audioPlayer: {fileID: 6778995825988199528}
+  dustPrefab: {fileID: 19800000, guid: 59b65d2fbb1ef7b4fa0b8c80295f741b, type: 3}
+  boomPrefab: {fileID: 19800000, guid: 9141ac68753bca04d94abf0fc30d2d30, type: 3}
 --- !u!54 &7768805141426117696
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -97,8 +105,104 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.4
+  m_Radius: 0.45
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!82 &6778995825988199528
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 408797473368988800}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 3395157227528284477, guid: ca9e5e0e32d37d540ab6d347d141e768, type: 2}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 0.35
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &7448469845547744003
 GameObject:
   m_ObjectHideFlags: 0
@@ -110,6 +214,7 @@ GameObject:
   - component: {fileID: 6344302154791021334}
   - component: {fileID: 2982979375188574499}
   - component: {fileID: 7858661716986957149}
+  - component: {fileID: 4633307878508675285}
   m_Layer: 0
   m_Name: Mesh
   m_TagString: Untagged
@@ -125,9 +230,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7448469845547744003}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.026, z: -0.001}
+  m_LocalScale: {x: 0.04546884, y: 0.03232152, z: 0.025335899}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1176466581536138829}
@@ -139,7 +244,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7448469845547744003}
-  m_Mesh: {fileID: 1907608370310603259, guid: 11d78089cfe9db445a519188ac3b6947, type: 3}
+  m_Mesh: {fileID: 7064395770682050818, guid: 3f0c4265918d5c140b0a824cc6badd1e, type: 3}
 --- !u!23 &7858661716986957149
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -160,7 +265,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 27eaeae71ea9c03e30c31a501aef60f0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -182,3 +287,25 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &4633307878508675285
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7448469845547744003}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 1
+  m_Enabled: 0
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 7064395770682050818, guid: 3f0c4265918d5c140b0a824cc6badd1e, type: 3}

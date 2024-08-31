@@ -1,20 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class bulletScript : MonoBehaviour
 {
     public float lifetime = 2f;            // Bullet lifetime in seconds
-    public int damage = 10;                // Damage value of the bullet
+    public int bulletDamage;           // Damage value of the bullet
     public GameObject owner;               // Reference to the owner of the bullet
     public int speed;
     public Rigidbody bulletsRigidbody;
+    public AudioClip[] bulletSounds;
 
     void Start()
     {
         // Destroy the bullet after its lifetime expires
         Destroy(gameObject, 2f);
         bulletsRigidbody = GetComponent<Rigidbody>();
+
+        //play randomBullet sound
+        AudioSource.PlayClipAtPoint(bulletSounds[Random.Range(0, bulletSounds.Length)], gameObject.transform.position, 1f);
 
     }
 
@@ -39,13 +44,16 @@ public class bulletScript : MonoBehaviour
 
     void OnHit(GameObject hitObject)
     {
-        // Example: Apply damage to the hit object if it has a health component
-        Health health = hitObject.GetComponent<Health>();
-        if (health != null)
+        // Deal damage to damagable objects
+        IDamageableKarl damageableObject = hitObject.GetComponent<IDamageableKarl>();
+        if (damageableObject != null)
         {
-            health.TakeDamage(damage);
+            damageableObject.TakeDamage(bulletDamage);
         }
-        else { Debug.Log("Hit something without health: " + hitObject.name); }
+        else 
+        { 
+            //Debug.Log("Hit something without interface: " + hitObject.name);        
+        }
 
         // Additional logic can be added here (e.g., spawning effects)
     }

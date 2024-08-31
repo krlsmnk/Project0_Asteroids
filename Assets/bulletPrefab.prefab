@@ -220,10 +220,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifetime: 5
-  damage: 10
+  bulletDamage: 1
   owner: {fileID: 0}
   speed: 0
   bulletsRigidbody: {fileID: 5202037227171089477}
+  bulletSounds:
+  - {fileID: 8300000, guid: 29732576554950248beecabca8f244c5, type: 3}
+  - {fileID: 8300000, guid: c9613f60d5937844aac1e5bf5468b997, type: 3}
+  - {fileID: 8300000, guid: 8c47568b6622d924f9b46b08188caefb, type: 3}
 --- !u!1 &7428788252532891829
 GameObject:
   m_ObjectHideFlags: 0

@@ -22,7 +22,7 @@ public class WallWrap : MonoBehaviour
     {
         if (direction == "LR")
         {
-            Debug.Log("LR " + obj.name);
+            //Debug.Log("LR " + obj.name);
 
             // Invert the X position and nudge towards the center
             float newX = obj.transform.position.x * -1 * 0.9f;
@@ -30,7 +30,7 @@ public class WallWrap : MonoBehaviour
         }
         else if (direction == "UD")
         {
-            Debug.Log("UD " + obj.name);
+            //Debug.Log("UD " + obj.name);
 
             // Invert the Z position and nudge towards the center
             float newZ = (obj.transform.position.z * -1 * 0.9f);
