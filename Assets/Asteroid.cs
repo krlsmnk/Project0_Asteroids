@@ -10,7 +10,7 @@ public class Asteroid : MonoBehaviour
     public float sizeThreshold; // If scale is below this, the asteroid pops instead of splitting
 
     private float damage;
-    float distanceOffset = 1;
+    float distanceOffset = .75f;
 
     private Vector3 rotationAxis;
 
@@ -49,18 +49,16 @@ public class Asteroid : MonoBehaviour
 
     void OnTriggerEnter(Collider collision)
     {
-        
-        //don't hit other rocks
-        if (collision.gameObject.CompareTag("asteroid"))
+
+        //don't hit other rocks or walls
+        if (collision.gameObject.GetComponent<Asteroid>()!=null || collision.gameObject.GetComponent<WallWrap>()!=null)
         {
             return;
         }
 
         // Check if hit by a bullet
-        if (collision.gameObject.CompareTag("bullet"))
+        else if (collision.gameObject.CompareTag("bullet"))
         {
-            Debug.Log("Hit by bullet!");
-
             // Call Split method if hit by a bullet
             Split();
             
@@ -90,8 +88,8 @@ public class Asteroid : MonoBehaviour
             float newSpeed = flySpeed * 1.5f;
 
             // Spawn two smaller asteroids
-            SpawnAsteroid(newScale, newSpeed, 35f);
-            SpawnAsteroid(newScale, newSpeed, -35f);
+            SpawnAsteroid(newScale, newSpeed, 25f);
+            SpawnAsteroid(newScale, newSpeed, -25f);
         }
 
         // Destroy the current asteroid
@@ -103,8 +101,14 @@ public class Asteroid : MonoBehaviour
         // Create a new rotation based on the angle offset
         Quaternion newRotation = Quaternion.Euler(0, angleOffset, 0) * transform.rotation;
 
+        // Calculate the new position
+        Vector3 newPosition = transform.position +
+                              transform.forward * distanceOffset +
+                              transform.right * distanceOffset * angleOffset / 25f;
+
         // Instantiate the new asteroid
-        GameObject newAsteroid = Instantiate(gameObject, transform.forward*distanceOffset*angleOffset, newRotation);
+        GameObject newAsteroid = Instantiate(gameObject, newPosition, newRotation);
+
 
         // Set the new asteroid's properties
         Asteroid asteroidScript = newAsteroid.GetComponent<Asteroid>();
