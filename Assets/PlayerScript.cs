@@ -18,6 +18,9 @@ public class PlayerScript : MonoBehaviour, IDamageableKarl
     //IDamageable Interface Vars
     public int CurrentHealth { get; set; }
     public int MaxHealth { get; set; }
+    public GameObject healthBarPrefab;
+    private GameObject myHealthBarInstance;
+    public Canvas canvasHUD;
 
     private bool useSlowMo = false;
     public ParticleSystem boomPrefab;
@@ -25,10 +28,18 @@ public class PlayerScript : MonoBehaviour, IDamageableKarl
     // Get the audioSource
     public AudioSource thrusters, deathExplosion;
 
+    public void updateHealthBar()
+    {
+        if (myHealthBarInstance == null) CreateHealthBarForSelf();
+        myHealthBarInstance.GetComponent<HealthBarScript>().UpdateHealthBar(CurrentHealth, MaxHealth);
+        //Debug.Log("Player sent: " + CurrentHealth + " / " + MaxHealth + "To the HealthBarScript");
+    }
+
     public void TakeDamage(int damageAmount)
     {
         CurrentHealth -= damageAmount;
         CurrentHealth = (int)Mathf.Clamp(CurrentHealth, 0, MaxHealth);
+        updateHealthBar();
         if (CurrentHealth <= 0) Die();
 
     }
@@ -86,10 +97,16 @@ public class PlayerScript : MonoBehaviour, IDamageableKarl
         //Assign thruster audio
         thrusters = GetComponent<AudioSource>();
         useSlowMo = true;
-    }
+        canvasHUD = FindObjectOfType<Canvas>();
+            if (canvasHUD != null)
+            {
+                CreateHealthBarForSelf();
+                updateHealthBar();
+            }
+        }
 
 
-    void FixedUpdate()
+        void FixedUpdate()
     {
         if(!dead) HandleMovement();        
     }
@@ -171,5 +188,18 @@ public class PlayerScript : MonoBehaviour, IDamageableKarl
         }
         
     }
+
+    public void CreateHealthBarForSelf()
+    {
+        // Instantiate the health bar under the CanvasHUD
+            myHealthBarInstance = Instantiate(healthBarPrefab, canvasHUD.transform);
+
+            // Set the target and offset for the health bar
+            HealthBarScript scriptInstance = myHealthBarInstance.GetComponent<HealthBarScript>();
+            scriptInstance.targetToFollow = gameObject;
+        
+    }
+
+
 
 }

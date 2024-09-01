@@ -57,6 +57,7 @@ MonoBehaviour:
   impactPlayer: {fileID: 8300000, guid: 4ecce94b3f12aa141a533f871f525718, type: 3}
   audioMixer: {fileID: 24100000, guid: ca9e5e0e32d37d540ab6d347d141e768, type: 2}
   audioPlayer: {fileID: 6778995825988199528}
+  healthBarPrefab: {fileID: 3970204209748565893, guid: f607b99cecfca4842967706e2c3fb91a, type: 3}
   dustPrefab: {fileID: 19800000, guid: 59b65d2fbb1ef7b4fa0b8c80295f741b, type: 3}
   boomPrefab: {fileID: 19800000, guid: 9141ac68753bca04d94abf0fc30d2d30, type: 3}
 --- !u!54 &7768805141426117696

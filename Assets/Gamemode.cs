@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using TMPro;
 
 public class GameMode : MonoBehaviour
 {
@@ -10,25 +11,27 @@ public class GameMode : MonoBehaviour
     public GameObject asteroidPrefab;
     public int asteroidLimit;
     public float spawnCooldown;
-    private int currentLevel;
     public float minSpeed;
     public float maxSpeed;
     public int asteroidSpawnScale;
 
     private float lastSpawnTime = 0f;
     private int currentAsteroids = 0;
-    public int score;
+    public int score, currentLevel;
 
     public AudioMixer audioMixer; // Reference to the AudioMixer
     private AudioSource musicSource;
     public AudioClip[] explosionSounds;
     public AudioSource explosionSource;
 
+    private Canvas canvasHUD;
+    private TextMeshProUGUI scoreNStuff;
 
     private float xMin, xMax, zMin, zMax;
 
     void Start()
     {
+        canvasHUD = FindObjectOfType<Canvas>();
         asteroidLimit = 2;
         spawnCooldown = 5f;
         currentLevel = 1;
@@ -36,6 +39,7 @@ public class GameMode : MonoBehaviour
         maxSpeed = 2f;
         asteroidSpawnScale = 4;
 
+        /*
         // Assuming the camera is orthographic and aligned to the screen's dimensions
             Camera cam = Camera.main;
             Vector3 screenBounds = cam.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, cam.transform.position.z));
@@ -43,8 +47,15 @@ public class GameMode : MonoBehaviour
             xMax = screenBounds.x;
             zMin = -screenBounds.y;
             zMax = screenBounds.y;
+        */
 
+        xMin = -19;
+        xMax = 19;
+        zMin = -10;
+        zMax = 10;
         score = 0;
+
+        updateUI();
         
 
         musicSource = GetComponent<AudioSource>();
@@ -59,6 +70,14 @@ public class GameMode : MonoBehaviour
         StartCoroutine(WaitForAudioToEnd());
 
 
+    }
+
+    void updateUI()
+    {
+        if(canvasHUD == null) canvasHUD = FindObjectOfType<Canvas>();
+        if(scoreNStuff == null) scoreNStuff = canvasHUD.GetComponentInChildren<TextMeshProUGUI>();
+
+        scoreNStuff.text = "Score: " + score.ToString() + " \t \t Level: " + currentLevel.ToString();
     }
 
     void Awake()
@@ -118,9 +137,11 @@ public class GameMode : MonoBehaviour
 
     public void HandleAsteroidDestroyed(bool biggus)
     {
+        updateUI();
+
         //Debug.Log("Score: " + score);
         // Decrease the asteroid count
-        if(biggus)currentAsteroids--;
+        if (biggus)currentAsteroids--;
 
         explosionSource.clip = explosionSounds[Random.Range(0, explosionSounds.Length)];
         explosionSource.Play();
@@ -151,6 +172,9 @@ public class GameMode : MonoBehaviour
             default:
                 break;
         }
+
+        updateUI();
+
         //Speed up the music
         SetPlaybackSpeed(0.9f + (float)currentLevel/10.0f);
         musicSource.Play();

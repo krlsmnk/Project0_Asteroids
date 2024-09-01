@@ -23,6 +23,9 @@ public class Asteroid : MonoBehaviour, IDamageableKarl
     //IDamageable Interface Vars
     public int CurrentHealth { get; set;}
     public int MaxHealth { get; set; }
+    public GameObject healthBarPrefab;
+    private GameObject myHealthBarInstance;
+    public Canvas canvasHUD;
 
     public ParticleSystem dustPrefab, boomPrefab;
 
@@ -39,6 +42,7 @@ public class Asteroid : MonoBehaviour, IDamageableKarl
             MaxHealth = scale;
         // Initialize CurrentHealth to MaxHealth at the start
             CurrentHealth = MaxHealth;
+        updateHealthBar();
     }
 
     public void TakeDamage(int damageAmount)
@@ -46,6 +50,7 @@ public class Asteroid : MonoBehaviour, IDamageableKarl
         //Debug.Log("Took Damage: " +  damageAmount);
         CurrentHealth -= damageAmount;
         CurrentHealth = (int)Mathf.Clamp(CurrentHealth, 0, MaxHealth);
+        updateHealthBar();
         if (CurrentHealth <= 0) Split();
         else
         {
@@ -89,6 +94,13 @@ public class Asteroid : MonoBehaviour, IDamageableKarl
         CurrentHealth = MaxHealth;
 
         audioPlayer = GetComponent<AudioSource>();
+
+        canvasHUD = FindObjectOfType<Canvas>();
+        if (canvasHUD != null)
+        {
+            CreateHealthBarForSelf();
+            updateHealthBar();
+        }
     }
 
     void Update()
@@ -166,6 +178,31 @@ public class Asteroid : MonoBehaviour, IDamageableKarl
         asteroidScript.flySpeed = newSpeed;
         asteroidScript.biggus = false;
     }
+
+    public void updateHealthBar()
+    {
+        if (myHealthBarInstance == null) CreateHealthBarForSelf();
+        myHealthBarInstance.GetComponent<HealthBarScript>().UpdateHealthBar(CurrentHealth, MaxHealth);
+        //Debug.Log("Asteroid sent: " + CurrentHealth + " / " + MaxHealth + "To the HealthBarScript");
+                
+    }
+
+    public void CreateHealthBarForSelf()
+    {
+
+        canvasHUD = FindObjectOfType<Canvas>();
+        if (canvasHUD != null)
+        {
+            // Instantiate the health bar under the CanvasHUD
+            myHealthBarInstance = Instantiate(healthBarPrefab, canvasHUD.transform);
+
+            // Set the target and offset for the health bar
+            HealthBarScript scriptInstance = myHealthBarInstance.GetComponent<HealthBarScript>();
+            scriptInstance.targetToFollow = gameObject;
+        }
+
+    }
+
 }
 
 
