@@ -141,7 +141,10 @@ public class GameMode : MonoBehaviour
 
         //Debug.Log("Score: " + score);
         // Decrease the asteroid count
-        if (biggus)currentAsteroids--;
+        if (biggus)
+        {
+            currentAsteroids--;            
+        }
 
         explosionSource.clip = explosionSounds[Random.Range(0, explosionSounds.Length)];
         explosionSource.Play();
@@ -202,6 +205,6 @@ public class GameMode : MonoBehaviour
 
         // Audio has finished playing, now trigger your function
         LevelRampUp();
-    }
+    }    
 
 }

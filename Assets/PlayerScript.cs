@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class PlayerScript : MonoBehaviour, IDamageableKarl
 {
-    public float moveSpeed = 2f;
-    public float rotationSpeed = 200f;
+    public float moveSpeed = 1f;
+    public float rotationSpeed = 150f;
     public GameObject bulletPrefab;
     public int bulletSpeed = 400;
     public float bulletSpawnOffset = 1f;
-    public float shootCooldown = 0.5f;  // Time in seconds between shots
+    public float shootCooldown;  // Time in seconds between shots
     private float lastShootTime = 0f;   // Time when the last shot was fired
+    private int shielded =0;
 
     public Camera mainCamera;
     private bool dead;
@@ -23,10 +24,17 @@ public class PlayerScript : MonoBehaviour, IDamageableKarl
     public Canvas canvasHUD;
 
     private bool useSlowMo = false;
-    public ParticleSystem boomPrefab;
+    public ParticleSystem boomPrefab, shieldPrefab;
+    private ParticleSystem shieldParticleInstance;
+
+    private bool isJumping;
+    private Collider shipCollider;
+    private float jumpDuration, jumpHeight;
+    private Vector3 movement; // To store movement input
 
     // Get the audioSource
     public AudioSource thrusters, deathExplosion;
+    public AudioClip powerupPickupClip, shieldLossClip;
 
     public void updateHealthBar()
     {
@@ -37,12 +45,24 @@ public class PlayerScript : MonoBehaviour, IDamageableKarl
 
     public void TakeDamage(int damageAmount)
     {
-        CurrentHealth -= damageAmount;
-        CurrentHealth = (int)Mathf.Clamp(CurrentHealth, 0, MaxHealth);
-        updateHealthBar();
-        if (CurrentHealth <= 0) Die();
+        if(shielded > 0)
+        {
+            deathExplosion.PlayOneShot(shieldLossClip, 0.5f);
+            shielded--;
+            if(shielded <1) shieldParticleInstance.Stop();
+            else if(shielded>=1) shieldParticleInstance.Play();
+            var mainModule = shieldParticleInstance.main;
+            mainModule.startSizeMultiplier = 0.25f + shielded;
+        }
+        else { 
+            CurrentHealth -= damageAmount;
+            CurrentHealth = (int)Mathf.Clamp(CurrentHealth, 0, MaxHealth);
+            updateHealthBar();
+            if (CurrentHealth <= 0) Die();
+        }
 
     }
+
     public void Die()
     {
         dead = true;
@@ -87,9 +107,12 @@ public class PlayerScript : MonoBehaviour, IDamageableKarl
         Destroy(gameObject);
     }
 
-
     void Start()
     {
+        shootCooldown = 0.7f;
+        jumpDuration = 1.25f;
+        jumpHeight = 5f;
+        shipCollider = GetComponent<Collider>();
         // Set the MaxHealth value
         MaxHealth = 25;
         // Initialize CurrentHealth to MaxHealth at the start
@@ -103,18 +126,49 @@ public class PlayerScript : MonoBehaviour, IDamageableKarl
                 CreateHealthBarForSelf();
                 updateHealthBar();
             }
-        }
 
+        shieldParticleInstance = Instantiate(shieldPrefab, gameObject.transform.position + Vector3.up*0.25f, Quaternion.identity);
+        shieldParticleInstance.transform.SetParent(gameObject.transform);
+        shieldParticleInstance.Stop();
 
-        void FixedUpdate()
+    }
+    
+    void FixedUpdate()
     {
         if(!dead) HandleMovement();        
     }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Backslash)) Die();
-        if (!dead) HandleShooting();
-        HandleExit();
+        if (!dead)
+        {
+            // Capture movement input (forward and backward)
+            float moveInput = Input.GetAxis("Vertical");
+            movement = transform.forward * moveInput * moveSpeed;
+
+            if (Input.GetKeyDown(KeyCode.Space) && !isJumping)
+            {
+                StartCoroutine(Jump());
+            }
+
+            // Assuming the ship is on the XZ plane (Y is up)
+            Plane plane = new Plane(Vector3.up, transform.position);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            if (plane.Raycast(ray, out float enter))
+            {
+                Vector3 hitPoint = ray.GetPoint(enter);
+                Vector3 direction = (hitPoint - transform.position).normalized;
+                Quaternion lookRotation = Quaternion.LookRotation(direction);
+                transform.rotation = lookRotation;
+            }
+
+            HandleShooting();
+            HandleExit();
+
+        }
+        
     }
 
     void HandleMovement()
@@ -131,9 +185,53 @@ public class PlayerScript : MonoBehaviour, IDamageableKarl
         transform.Rotate(Vector3.up, rotateInput * rotationSpeed * Time.deltaTime);
     }
 
+    IEnumerator Jump()
+    {
+        isJumping = true;
+        float initialY = transform.position.y;
+        float elapsedTime = 0f;
+
+        // Disable the collider during the jump
+        shipCollider.enabled = false;
+
+        // Ascend
+        while (elapsedTime < jumpDuration / 2)
+        {
+            float newY = Mathf.Lerp(initialY, initialY + jumpHeight, elapsedTime / (jumpDuration / 2));
+            transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Peak
+        transform.position = new Vector3(transform.position.x, initialY + jumpHeight, transform.position.z);
+
+        // Reset elapsed time for descent
+        elapsedTime = 0f;
+
+        // Descend
+        while (elapsedTime < jumpDuration / 2)
+        {
+            float newY = Mathf.Lerp(initialY + jumpHeight, initialY, elapsedTime / (jumpDuration / 2));
+            transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // End jump
+        transform.position = new Vector3(transform.position.x, initialY, transform.position.z);
+
+        // Re-enable the collider after the jump
+        shipCollider.enabled = true;
+
+        isJumping = false;
+    }
+
     void HandleShooting()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetMouseButton(0))
         {
             Shoot();
         }
@@ -200,6 +298,37 @@ public class PlayerScript : MonoBehaviour, IDamageableKarl
         
     }
 
+    public void ActivatePowerup(string name, int value)
+    {
+        deathExplosion.PlayOneShot(powerupPickupClip, 0.35f);
+
+        switch (name)
+        {
+            case "Health": CurrentHealth += value;
+                if (CurrentHealth > MaxHealth) MaxHealth = CurrentHealth;
+                updateHealthBar(); 
+                break;
+            case "Speed":
+                moveSpeed += (float)value / 6;
+                break;
+            case "Shield":
+                //enable shield particle
+                shielded++;
+                shieldParticleInstance.Play();
+                var mainModule = shieldParticleInstance.main;
+                mainModule.startSizeMultiplier = 0.25f + shielded;
+                break;
+            case "Shoot":
+                shootCooldown = Mathf.Max(shootCooldown - (float)value / 100f, 0.05f);
+                if(shootCooldown <= 0.05f)
+                {
+                    CurrentHealth += value;
+                    if (CurrentHealth > MaxHealth) MaxHealth = CurrentHealth;
+                    updateHealthBar();
+                }
+                break;
+        }
+    }
 
 
 }

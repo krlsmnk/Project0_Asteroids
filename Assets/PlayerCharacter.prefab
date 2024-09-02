@@ -128,8 +128,11 @@ MonoBehaviour:
   healthBarPrefab: {fileID: 3970204209748565893, guid: f607b99cecfca4842967706e2c3fb91a, type: 3}
   canvasHUD: {fileID: 0}
   boomPrefab: {fileID: 19800000, guid: 7d4e7d6489dd62f4e8299683a37292cd, type: 3}
+  shieldPrefab: {fileID: 19800000, guid: 0b3c1bdbfb9398445848f14f82fe04eb, type: 3}
   thrusters: {fileID: 0}
   deathExplosion: {fileID: 0}
+  powerupPickupClip: {fileID: 8300000, guid: 9cdf36b37d2d32241bbb1de2ab1b5de4, type: 3}
+  shieldLossClip: {fileID: 8300000, guid: 24c4d8f9f2f4ea34b9ea7d567887dcc5, type: 3}
 --- !u!114 &-4633032760191819180
 MonoBehaviour:
   m_ObjectHideFlags: 0

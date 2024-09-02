@@ -29,6 +29,9 @@ public class Asteroid : MonoBehaviour, IDamageableKarl
 
     public ParticleSystem dustPrefab, boomPrefab;
 
+    [SerializeField] public string[] powerupNames;
+    public GameObject powerupPrefab;
+
 
     public void Initialize(int customScale)
     {
@@ -63,13 +66,17 @@ public class Asteroid : MonoBehaviour, IDamageableKarl
         }
 
     }
+
     public void Die()
     {
         GameMode.Instance.score += scale;
         GameMode.Instance.HandleAsteroidDestroyed(biggus);
         ParticleSystem boomInstance = Instantiate(boomPrefab, new Vector3(gameObject.transform.position.x, 2, gameObject.transform.position.z), Quaternion.identity);
         boomInstance.startSize = boomInstance.startSize * scale;
-        Destroy(boomInstance.gameObject, boomInstance.main.duration); 
+        Destroy(boomInstance.gameObject, boomInstance.main.duration);
+
+        if(biggus)SpawnPowerup(gameObject.transform.position);
+
         Destroy(gameObject);
     }
 
@@ -114,20 +121,9 @@ public class Asteroid : MonoBehaviour, IDamageableKarl
 
     void OnTriggerEnter(Collider collision)
     {
-
-        //don't hit other rocks or walls
-        if (collision.gameObject.GetComponent<WallWrap>() != null || collision.gameObject.GetComponent<Asteroid>()!=null)
+        //if we ram the player
+        if (collision.gameObject.GetComponent<PlayerScript>() != null)
         {
-            return;
-        }
-        // Check if hit by a bullet
-        else if (collision.gameObject.CompareTag("bullet"))
-        {
-            // Bullet Handles Dealing Damage to This                        
-        }
-        else
-        {
-
             //Debug.Log("Hit by something!");
             // Deal damage to damagable objects
             IDamageableKarl damageableObject = collision.gameObject.GetComponent<IDamageableKarl>();
@@ -138,6 +134,10 @@ public class Asteroid : MonoBehaviour, IDamageableKarl
 
             // Call TakeDamage method
             TakeDamage(1);
+        }             
+        else
+        {
+            return;
         }
     }
 
@@ -201,6 +201,24 @@ public class Asteroid : MonoBehaviour, IDamageableKarl
             scriptInstance.targetToFollow = gameObject;
         }
 
+    }
+
+    private void SpawnPowerup(Vector3 spawnPosition)
+    {
+        bool sucessfulSpawn = Random.Range(0, 3) == 2;
+        if (sucessfulSpawn)
+        {
+            // Choose a random index
+            int randomIndex = Random.Range(0, powerupNames.Length);
+
+            // Instantiate the powerup at the given position
+            GameObject powerupObject = Instantiate(powerupPrefab, spawnPosition, powerupPrefab.transform.rotation);
+
+            // Initialize the powerup with its corresponding name and value
+            Powerup powerup = powerupObject.GetComponent<Powerup>();
+            powerup.Initialize(powerupNames[randomIndex], scale);
+        }
+       
     }
 
 }
