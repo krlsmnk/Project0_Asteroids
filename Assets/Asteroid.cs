@@ -205,7 +205,7 @@ public class Asteroid : MonoBehaviour, IDamageableKarl
 
     private void SpawnPowerup(Vector3 spawnPosition)
     {
-        bool sucessfulSpawn = Random.Range(0, 3) == 2;
+        bool sucessfulSpawn = Random.Range(0, 2) == 1;
         if (sucessfulSpawn)
         {
             // Choose a random index
